@@ -2,63 +2,31 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	g "github.com/AllenDang/giu"
-
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
 )
 
-var client_docker *client.Client
-var containers = make([]types.Container, 0)
+var docker_info DockerInfo
 
-func update_containers_loop() {
+func update_loop(ctx context.Context) {
 	for {
 		time.Sleep(time.Duration(time.Duration.Seconds(1)))
 
-		containers_temp, err := client_docker.ContainerList(context.Background(), types.ContainerListOptions{})
-		if err != nil {
-			panic(err)
-		}
-
-		containers = containers_temp
+		docker_info.update(ctx)
 		g.Update()
 	}
 }
 
-func list_label() []g.Widget {
-	labels := make([]g.Widget, 10)
-	for _, container := range containers {
-		labels = append(labels, g.Label(container.ID))
-	}
-	return labels
-}
-
 func run() {
-	g.SingleWindow().Layout(
-		//g.Label("Docker"),
-		list_label()...,
-	)
+	run_gui()
 }
 
 func main() {
-	fmt.Println("Hello, World!")
-	cli, err := client.NewClientWithOpts(client.FromEnv)
-	if err != nil {
-		panic(err)
-	}
-	client_docker = cli
+	ctx := context.Background()
+	docker_info = new_docker_info()
 
-	go update_containers_loop()
-
-	containers_temp, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	containers = containers_temp
+	go update_loop(ctx)
 
 	window := g.NewMasterWindow("Docker", 640, 360, 0)
 	window.Run(run)
