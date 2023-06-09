@@ -27,7 +27,7 @@ func new_docker_info() DockerInfo {
 }
 
 func (info *DockerInfo) update(ctx context.Context) {
-	containers, err := info.client.ContainerList(ctx, types.ContainerListOptions{})
+	containers, err := info.client.ContainerList(ctx, types.ContainerListOptions{All: true})
 	if err != nil {
 		panic(err)
 	}

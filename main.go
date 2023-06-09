@@ -7,7 +7,9 @@ import (
 	g "github.com/AllenDang/giu"
 )
 
+var ctx context.Context
 var docker_info DockerInfo
+var master_window *g.MasterWindow
 
 func update_loop(ctx context.Context) {
 	for {
@@ -23,11 +25,11 @@ func run() {
 }
 
 func main() {
-	ctx := context.Background()
+	ctx = context.Background()
 	docker_info = new_docker_info()
 
 	go update_loop(ctx)
 
-	window := g.NewMasterWindow("Docker", 640, 360, 0)
-	window.Run(run)
+	master_window = g.NewMasterWindow("Docker", 1280, 720, 0)
+	master_window.Run(run)
 }
