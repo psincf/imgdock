@@ -15,7 +15,10 @@ func update_loop(ctx context.Context) {
 	for {
 		time.Sleep(time.Duration(time.Duration.Seconds(1)))
 
-		docker_info.update(ctx)
+		err := docker_info.update(ctx)
+		if err != nil {
+			println(err)
+		}
 		g.Update()
 	}
 }
